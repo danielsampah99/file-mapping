@@ -1,10 +1,9 @@
 # importing necessary python packages.
-import pandas as pd
-from fuzzywuzzy import process
 import re
+import pandas as pd
 
 # Load the .csv file exported from wholesale2b.com
-wholesale2b_dataframe = pd.read_csv(r"all (5).csv")
+wholesale2b_dataframe = pd.read_csv(r"wholesale2b all categories products (2).csv")
 
 print(set(wholesale2b_dataframe['w2b_category_1']))
 
@@ -74,79 +73,75 @@ w2b_category_ids = new_dataframe['CategoryId']
 
 # Obyshi category ids.
 obyshi_category_ids = [
-	'Health & Beauty', 'Health & Recovery', 'Vitamins & Supplements', 'Athletic & Fitness', 'Sports & Outside',
-	'Appliances', 'Automotive', 'Electronics', 'Household Goods', 'Office Supplies & School', 'Pet Supplies',
-	'Baby & Kids' 'Fashion', 'Digital Product', 'Arts & Crafts', 'Adults Only', 'Cell Phones & Accessories',
-	'Costumes & Props', 'Fragrance & Perfume', 'General Merchandise', 'Grocery', 'Games & Hobbies',
-	'Home Improvement', 'Home, Garden & Furniture', 'Jewelry', 'Kitchen', 'Musical Instruments', 'Watches',
-	'Mystic & Charming'
+	'Health & Beauty', 'Health & Recovery', 'Vitamins & Supplements', 'Sporting & Exercise',
+	'Automotive Parts and Accessories', 'Electronics', 'Office & School Supplies', 'Pet Supplies',
+	'Baby & Kids', 'Fashion', 'Arts, Crafts & DIYs', 'Adults Only', 'Cell Phones & Accessories', 'Costumes & Props',
+	'Fragrance & Perfume', 'General Merchandise', 'Groceries & Whole Foods', 'Toys, Games & Hobbies',
+	'Home Improvement', 'Home, Garden & Furniture', 'Jewelry', 'Kitchen & Appliances', 'Musical Instruments', 'Watches',
+	'Mystic & Charming', 'Computers & Networking', 'Eyewear & Optics', 'Festive Occasions',
+	'Marine & Boating', 'Knives & Multi-Tools', 'Bags, Luggage & Travel Gear', 'Boots & Shoes',
+	'Vintage Telecommunication', 'Outdoors', 'Gifts & Gadgets', 'For Sports Fans', 'Safety & Security',
+	'Tools & Hardware'
 ]
 
 wholesale2b_to_obyshi_dictionary = {
 	'Health & Beauty': 'Health & Beauty',
 	'Medical': 'Health & Recovery',
-	'Optics': 'Health & Recovery',
+	'Optics': 'Eyewear & Optics',
 	'Vitamins & Supplements': 'Vitamins & Supplements',
-	'Sporting & Exercise': 'Sports & Outside',
-	'Sports Fan Gifts': 'Sports & Outside',
-	'Outdoors': 'Sports & Outside',
-	'Automotive & Motorcycle': 'Automotive',
+	'Sporting & Exercise': 'Sporting & Exercise',
+	'Sports Fan Gifts': 'For Sports Fans',
+	'Outdoors': 'Outdoors',
+	'Automotive & Motorcycle': 'Automotive Parts and Accessories',
 	'Electronics': 'Electronics',
-	'Gadgets & Gifts': 'Electronics',
-	'Office Supplies & School': 'Office Supplies & School',
+	'Gadgets & Gifts': 'Gifts & Gadgets',
+	'Office Supplies & School': 'Office & School Supplies',
 	'Educational': 'Office Supplies & School',
 	'Pet Supplies': 'Pet Supplies',
 	'Baby & Toddler': 'Baby & Kids',
-	'Toys & Games': 'Baby & Kids',
+	'Toys & Games': 'Toys, Games & Hobbies',
 	'Apparel & Clothing': 'Fashion',
-	'Shoes & Boots': 'Fashion',
-	'Eyewear': 'Fashion',
-	'Travel & Bags': 'Fashion',
-	'Computers & Networking': 'Digital Product',
-	'Telecommunication': 'Digital Product',
-	'Arts & Crafts': 'Arts & Crafts',
+	'Shoes & Boots': 'Boots & Shoes',
+	'Eyewear': 'Eyewear & Optics',
+	'Travel & Bags': 'Bags, Luggage & Travel Gear',
+	'Computers & Networking': 'Computers & Networking',
+	'Telecommunication': 'Vintage Telecommunication',
+	'Arts & Crafts': 'Arts, Crafts & DIYs',
 	'Adults Only': 'Adults Only',
 	'Cell Phones & Accessories': 'Cell Phones & Accessories',
 	'Costumes & Props': 'Costumes & Props',
 	'Occult & Magical': 'Mystic & Charming',
 	'Fragrance & Perfume': 'Fragrance & Perfume',
 	'General Merchandise': 'General Merchandise',
-	'Security & Safety': 'General Merchandise',
-	'Marine & Boating': 'General Merchandise',
-	'Seasonal & Special Occasions': 'General Merchandise',
-	'Tools & Hardware': 'General Merchandise',
-	'Knives & Multi-tools': 'General Merchandise',
+	'Security & Safety': 'Safety & Security',
+	'Marine & Boating': 'Marine & Boating',
+	'Seasonal & Special Occasions': 'Festive Occasions',
+	'Tools & Hardware': 'Tools & Hardware',
+	'Knives & Multi-tools': 'Knives & Multi-Tools',
 	'Accessories': 'General Merchandise',
-	'Grocery': 'Grocery',
-	'Hobbies': 'Games & Hobbies',
+	'Grocery': 'Groceries & Whole Foods',
+	'Hobbies': 'Toys, Games & Hobbies',
 	'Home Improvement': 'Home Improvement',
 	'Home, Garden & Furniture': 'Home, Garden & Furniture',
 	'Jewelry': 'Jewelry',
-	'Kitchen': 'Kitchen',
+	'Kitchen': 'Kitchen & Appliances',
 	'Musical Instruments': 'Musical Instruments',
 	'Watches': 'Watches',
+	'Books & Videos': 'Office & School Supplies',
+	'Bulk Accessories': 'General Merchandise',
 }
 
-
-# Loop through wholesale2b's list of category ids and find the most similar obyshi category id value.
-def fuzzy_match(w2b_category_id):
-	closest_match, score = process.extractOne(w2b_category_id, obyshi_category_ids)
-	if score >= 50:
-		return closest_match
-	else:
-		return w2b_category_id
-
-
-# new_dataframe["CategoryId"] = new_dataframe["CategoryId"].apply(fuzzy_match)
-
 obyshi_category_mapping = {
-	'Health & Beauty': 7, 'Health & Recovery': 8, 'Vitamins & Supplements': 12, 'Athletic & Fitness': 13,
-	'Sports & Outside': 14, 'Appliances': 15, 'Automotive': 16, 'Electronics': 17, 'Household Goods': 18,
-	'Office Supplies & School': 19, 'Pet Supplies': 20, 'Baby & Kids': 21, 'Fashion': 26, 'Digital Product': 27,
-	'Arts & Crafts': 28, 'Adults Only': 29, 'Cell Phones & Accessories': 30, 'Costumes & Props': 31,
-	'Fragrance & Perfume': 32, 'General Merchandise': 33, 'Grocery': 34, 'Games & Hobbies': 35, 'Home Improvement': 36,
-	'Home, Garden & Furniture': 37, 'Jewelry': 38, 'Kitchen': 39, 'Musical Instruments': 40, 'Watches': 41,
-	'Mystic & Charming': 43,
+	'Health & Beauty': 7, 'Health & Recovery': 8, 'Vitamins & Supplements': 12, 'Sporting & Exercise': 14,
+	'Automotive Parts and Accessories': 16, 'Electronics': 17, 'Office & School Supplies': 19, 'Pet Supplies': 20,
+	'Baby & Kids': 21, 'Fashion': 26, 'Arts, Crafts & DIYs': 28, 'Adults Only': 29, 'Cell Phones & Accessories': 30,
+	'Costumes & Props': 31, 'Fragrance & Perfume': 32, 'General Merchandise': 33, 'Groceries & Whole Foods': 34,
+	'Toys, Games & Hobbies': 35, 'Home Improvement': 36, 'Home, Garden & Furniture': 37, 'Jewelry': 38,
+	'Kitchen & Appliances': 39, 'Musical Instruments': 40, 'Watches': 41, 'Mystic & Charming': 43,
+	'Computers & Networking': 45, 'Eyewear & Optics': 47, 'Festive Occasions': 48, 'Marine & Boating': 49,
+	'Knives & Multi-Tools': 50, 'Bags, Luggage & Travel Gear': 51, 'Boots & Shoes': 52, 'Vintage Telecommunication': 53,
+	'Outdoors': 54, 'Gifts & Gadgets': 55, 'For Sports Fans': 56, 'Safety & Security': 57, 'Tools & Hardware': 58
+
 }
 
 # Replacing wholesale2b category names with obyshi category names and then ids.
@@ -183,4 +178,4 @@ def remove_special_characters(text):
 new_dataframe = new_dataframe.map(remove_special_characters)
 
 # Writing the dataframe to a .csv file.
-new_dataframe.to_csv("eleven thousand_mysticandcharming.csv", index=False, encoding='utf-8')
+new_dataframe.to_csv("all new product categories.csv", index=False, encoding='utf-8')
