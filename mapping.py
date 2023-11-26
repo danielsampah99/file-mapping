@@ -1,6 +1,7 @@
 # importing necessary python packages.
 import re
 import pandas as pd
+import os
 
 # Load the .csv file exported from wholesale2b.com
 wholesale2b_dataframe = pd.read_csv(r"wholesale2b all categories products (2).csv")
@@ -177,5 +178,46 @@ def remove_special_characters(text):
 
 new_dataframe = new_dataframe.map(remove_special_characters)
 
-# Writing the dataframe to a .csv file.
-new_dataframe.to_csv("all new product categories.csv", index=False, encoding='utf-8')
+
+# Adding attributes to products that match a particular number in a category.
+def defining_attributes_of_products():
+	condition_boots = new_dataframe['CategoryId'] == 52
+	condition_fashion = new_dataframe['CategoryId'] == 26
+	condition_watches = new_dataframe['CategoryId'] == 41
+	# Updating the attribute.
+	new_dataframe.loc[condition_boots, 'Attribute'] = '{"size":["5""6""7"]"color":["black""white"]}'
+	new_dataframe.loc[condition_fashion, 'Attribute'] = '{"Size":["xs""s""m""l""xl"]}'
+	new_dataframe.loc[condition_watches, 'Attribute'] = '{"Wrist size":["up to 6 inches""6 to 7""7 to 8""8 and ' \
+	                                                    'up"]"Case diameter":["36mm""40mm""44mm""48mm"]} '
+
+
+defining_attributes_of_products()
+
+
+def splitting_dataframe_into_files():
+	rows_per_file = 3000
+
+	# Making sure the 'rows_per_file' variable is an integer
+	if not isinstance(rows_per_file, int):
+		raise ValueError("rows_per_file must be an integer")
+
+	number_of_files_needed = len(new_dataframe) // rows_per_file + (len(new_dataframe) % rows_per_file > 0)
+
+	new_dataframe_list = [
+		new_dataframe.iloc[i:i + rows_per_file].copy() for i in range(0, len(new_dataframe), rows_per_file)
+	]
+
+	# Creating the output directory if it does not exist.
+	output_directory = rf"output"
+
+	try:
+		os.mkdir(output_directory)
+	except OSError as error:
+		print(error)
+
+	# Writing the dataframe to a .csv file.
+	for i, smaller_df in enumerate(new_dataframe_list):
+		smaller_df.to_csv(f"output_files/attributes_file_{i + 1}.csv", index=False, encoding='utf-8')
+
+
+splitting_dataframe_into_files()
