@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 # Load the .csv file exported from wholesale2b.com
-wholesale2b_dataframe = pd.read_csv(r"wholesale2b all categories products (2).csv")
+wholesale2b_dataframe = pd.read_csv(r"/home/daniel/Downloads/wholesale2b_9k.csv")
 
 print(set(wholesale2b_dataframe['w2b_category_1']))
 
@@ -16,7 +16,9 @@ column_structure = ['SKU', 'ProductName', 'Supplier', 'Brand', 'CategoryId',
                     'ShippingPrice', 'SalesTaxPct', 'IsTopDeals', 'IsTodaysDeals',
                     'IsBulkProduct', 'MinimumBulk', 'MaximumBulk', 'ReturnPolicy',
                     'AvgShippingDays', 'Attribute', 'IsDropshipping', 'Status', 'Type',
-                    'Description']
+					'Description', 'extra_img_1', 'extra_img_2', 'extra_img_3', 'extra_img_4', 
+					'extra_img_5', 'extra_img_6', 'extra_img_7', 'extra_img_8', 'extra_img_9', 
+					'extra_img_10'         ]
 
 # Define a dictionary to map old column names to new column names
 column_mapping = {'sku': 'SKU',
@@ -52,7 +54,18 @@ column_mapping = {'sku': 'SKU',
                   'na_isdropshipping': 'IsDropshipping',
                   'na_status': 'Status',
                   'na_type': 'Type',
-                  'description': 'Description', }
+                  'description': 'Description', 
+                  'extra_img_1': 'extra_img_1', 
+                  'extra_img_2': 'extra_img_2', 
+                  'extra_img_3': 'extra_img_3', 
+                  'extra_img_4': 'extra_img_4', 
+                  'extra_img_5': 'extra_img_5', 
+                  'extra_img_6': 'extra_img_6', 
+                  'extra_img_7': 'extra_img_7', 
+                  'extra_img_8': 'extra_img_8', 
+                  'extra_img_9': 'extra_img_9', 
+                  'extra_img_10': 'extra_img_10'
+                  }
 
 # Create a new dataframe with a column structure of the obyshi.csv file.
 new_dataframe = pd.DataFrame({column_name: [] for column_name in column_structure})
@@ -195,7 +208,7 @@ defining_attributes_of_products()
 
 
 def splitting_dataframe_into_files():
-	rows_per_file = 3000
+	rows_per_file = 1000
 
 	# Making sure the 'rows_per_file' variable is an integer
 	if not isinstance(rows_per_file, int):
@@ -208,7 +221,7 @@ def splitting_dataframe_into_files():
 	]
 
 	# Creating the output directory if it does not exist.
-	output_directory = rf"output"
+	output_directory = rf"output_files"
 
 	try:
 		os.mkdir(output_directory)
