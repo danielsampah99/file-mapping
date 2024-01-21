@@ -4,11 +4,11 @@ import pandas as pd
 import os
 
 # Load the .csv file exported from wholesale2b.com
-wholesale2b_dataframe = pd.read_csv(r"/home/daniel/Downloads/wholesale2b_9k.csv")
+wholesale2b_dataframe = pd.read_csv(r"/home/daniel/Downloads/Documents/wholesale2b_9k.csv")
 
 print(set(wholesale2b_dataframe['w2b_category_1']))
 
-# Column structure of new dataframe based on the exported file from obyshi.com.
+# Columns of the new dataframe as seen in obyshi.com's exported file.
 column_structure = ['SKU', 'ProductName', 'Supplier', 'Brand', 'CategoryId',
                     'SubcategoryId', 'ChildcategoryId', 'Manufacturer', 'ProductType',
                     'DownloadLink', 'Price', 'Discount', 'Wholesale', 'MapPrice',
@@ -50,7 +50,7 @@ column_mapping = {'sku': 'SKU',
                   'na_maximumbulk': 'MaximumBulk',
                   'return_policy': 'ReturnPolicy',
                   'avg_shipping_days': 'AvgShippingDays',
-                  'na_attribute': 'Attribute',
+                  'attribute_list': 'Attribute',
                   'na_isdropshipping': 'IsDropshipping',
                   'na_status': 'Status',
                   'na_type': 'Type',
@@ -173,7 +173,7 @@ new_dataframe.fillna(cell_replacements, inplace=True)
 # Making some columns zeros.
 columns_to_zero = [
 	"Brand", "SubcategoryId", "ChildcategoryId", "Manufacturer", "ProductType", "IsTopDeals", "IsTodaysDeals",
-	"IsBulkProduct", "MinimumBulk", "MaximumBulk", "Attribute"
+	"IsBulkProduct", "MinimumBulk", "MaximumBulk"
 ]
 new_dataframe.loc[:, columns_to_zero] = 0
 
@@ -181,30 +181,17 @@ new_dataframe.loc[:, columns_to_zero] = 0
 columns_to_one = ["Unit", "IsDropshipping", "Status", "Type"]
 new_dataframe.loc[:, columns_to_one] = 1
 
+# Converting : to = in the Attribute column.
+new_dataframe['Attribute'] = new_dataframe['Attribute'].apply(lambda x: x.replace(':', '=') if isinstance(x, str) else x)
 
-# Function to remove all special characters in string columns in the dataframe.
-def remove_special_characters(text):
-	if pd.api.types.is_string_dtype(text):
-		return re.sub(r'[a-zA-z0-9\s]', ' ', text)
-	return text
+#ALTERNATIVE
+# for i in new_dataframe.index: 
+# 	new_dataframe.loc[i, 'Attribute'] = str(new_dataframe.loc[i, 'Attribute']).replace(':', '=')
 
+# Removing the special characters in the new 'Attributes' column.
+# new_dataframe['Attribute'] = new_dataframe['Attribute'].map(str).apply(lambda x: x.encode('utf-8').decode('ascii', 'ignore'))
+new_dataframe = new_dataframe.replace(to_replace=['\n', '\t', '\r', '$', '@', '^'], value='', regex=True)
 
-new_dataframe = new_dataframe.map(remove_special_characters)
-
-
-# Adding attributes to products that match a particular number in a category.
-def defining_attributes_of_products():
-	condition_boots = new_dataframe['CategoryId'] == 52
-	condition_fashion = new_dataframe['CategoryId'] == 26
-	condition_watches = new_dataframe['CategoryId'] == 41
-	# Updating the attribute.
-	new_dataframe.loc[condition_boots, 'Attribute'] = '{"size":["5""6""7"]"color":["black""white"]}'
-	new_dataframe.loc[condition_fashion, 'Attribute'] = '{"Size":["xs""s""m""l""xl"]}'
-	new_dataframe.loc[condition_watches, 'Attribute'] = '{"Wrist size":["up to 6 inches""6 to 7""7 to 8""8 and ' \
-	                                                    'up"]"Case diameter":["36mm""40mm""44mm""48mm"]} '
-
-
-defining_attributes_of_products()
 
 
 def splitting_dataframe_into_files():
@@ -227,6 +214,8 @@ def splitting_dataframe_into_files():
 		os.mkdir(output_directory)
 	except OSError as error:
 		print(error)
+	except FileExistsError as error: 
+		print(f'File exists: {error}')
 
 	# Writing the dataframe to a .csv file.
 	for i, smaller_df in enumerate(new_dataframe_list):
