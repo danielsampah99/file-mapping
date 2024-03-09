@@ -8,6 +8,11 @@ wholesale2b_dataframe = pd.read_csv(r"/home/daniel/Downloads/Documents/wholesale
 
 print(set(wholesale2b_dataframe['w2b_category_1']))
 
+# <select name="attribute" id="attribute"><option value="Color=Green">Color=Green</option></select>
+# <select name="attribute_2" id="attribute_2"><option value="Size=8 ft">Size=8 ft</option></select>
+
+
+
 # Columns of the new dataframe as seen in obyshi.com's exported file.
 column_structure = ['SKU', 'ProductName', 'Supplier', 'Brand', 'CategoryId',
                     'SubcategoryId', 'ChildcategoryId', 'Manufacturer', 'ProductType',
@@ -15,10 +20,11 @@ column_structure = ['SKU', 'ProductName', 'Supplier', 'Brand', 'CategoryId',
                     'HandlingFee', 'Unit', 'Stock', 'IfStockEmpty', 'Upc', 'Image',
                     'ShippingPrice', 'SalesTaxPct', 'IsTopDeals', 'IsTodaysDeals',
                     'IsBulkProduct', 'MinimumBulk', 'MaximumBulk', 'ReturnPolicy',
-                    'AvgShippingDays', 'Attribute', 'IsDropshipping', 'Status', 'Type',
+                    'AvgShippingDays', 'Attribute', 'AttributeTwo', 'AttributeQty', 'IsDropshipping', 'Status', 'Type',
 					'Description', 'extra_img_1', 'extra_img_2', 'extra_img_3', 'extra_img_4', 
 					'extra_img_5', 'extra_img_6', 'extra_img_7', 'extra_img_8', 'extra_img_9', 
-					'extra_img_10'         ]
+					'extra_img_10'         
+					]
 
 # Define a dictionary to map old column names to new column names
 column_mapping = {'sku': 'SKU',
@@ -190,12 +196,13 @@ new_dataframe['Attribute'] = new_dataframe['Attribute'].apply(lambda x: x.replac
 
 # Removing the special characters in the new 'Attributes' column.
 # new_dataframe['Attribute'] = new_dataframe['Attribute'].map(str).apply(lambda x: x.encode('utf-8').decode('ascii', 'ignore'))
-new_dataframe = new_dataframe.replace(to_replace=['\n', '\t', '\r', '$', '@', '^'], value='', regex=True)
 
+# regular expressions = [^a-zA-Z\s:/\.-]
+# new_dataframe = new_dataframe.replace(to_replace=['\n', '\t', '\r', '$', '@', '^'], value='', regex=True)
 
 
 def splitting_dataframe_into_files():
-	rows_per_file = 1000
+	rows_per_file = 500
 
 	# Making sure the 'rows_per_file' variable is an integer
 	if not isinstance(rows_per_file, int):
@@ -220,6 +227,8 @@ def splitting_dataframe_into_files():
 	# Writing the dataframe to a .csv file.
 	for i, smaller_df in enumerate(new_dataframe_list):
 		smaller_df.to_csv(f"output_files/attributes_file_{i + 1}.csv", index=False, encoding='utf-8')
+	
+	print(f'Complete. Find the directory at ./{output_directory}')
 
 
 splitting_dataframe_into_files()
